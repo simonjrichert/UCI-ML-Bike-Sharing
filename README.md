@@ -1,28 +1,33 @@
 # Two-split bike demand model
 
-One linear regression, trained twice on the same 17,379 hours of bike rentals
-(UCI Bike Sharing, 2011-2012). Same features, same model, same metric. The only
-thing that changes is how the hours are divided into training and test rows.
+Two models, each trained twice on the same 17,379 hours of bike rentals
+(UCI Bike Sharing, 2011-2012). Same features, same metric. The only thing that
+changes between the two scores for a model is how the hours are divided into
+training and test rows.
 
-The point is not the score. The point is that one of these two scores is a lie,
-and the code says which one.
+The best forecast is a gradient-boosted tree. A plain linear regression is kept
+beside it so the split can be seen without a change of algorithm mixed in. The
+lower score is not the one to trust.
 
 ## Result
 
-| Split | Test hours | Mean baseline RMSE | Model RMSE | Model's edge |
-|---|---|---|---|---|
-| Random 20% of all hours | 3,475 | 182.7 | 141.2 | 23% |
-| Everything after 2012-11-01 | 1,460 | 174.4 | 151.0 | 13% |
+| Split | Test hours | Mean baseline | Linear RMSE | Linear edge | Trees RMSE | Trees edge |
+|---|---|---|---|---|---|---|
+| Random 20% of all hours | 3,475 | 182.7 | 141.2 | 23% | 43.5 | 76% |
+| Everything after 2012-11-01 | 1,460 | 174.4 | 151.0 | 13% | 70.3 | 60% |
 
-Shuffling the hours makes the model look 9.8 rentals/hour more accurate than it
-is when asked to predict hours it has never seen. Measured against the dumb
-baseline on each test set, the model's edge roughly halves: 23% becomes 13%.
+On the future hours, the trees miss by 70.3 rentals per hour and the linear
+model misses by 151.0. That is the better forecast.
 
-That comparison against the baseline is the honest one. The two test sets are
-different sets of hours, so 141.2 and 151.0 are not directly comparable on their
-own. November and December are quieter and less variable than the full year, so
-even the baseline's error changes between splits. Improvement over the baseline
-is the number that survives that difference.
+Shuffling still flatters both models, and it flatters the trees more. Their
+error drops from 70.3 to 43.5, a gap of 26.8 rentals per hour, against 9.8 for
+the linear model. Measured against the baseline on each test set, the trees'
+edge falls from 76% to 60%, and the linear model's from 23% to 13%.
+
+The two test sets are different hours, so 43.5 and 70.3 are not directly
+comparable on their own. November and December are quieter than the full year,
+which is why the baseline itself moves from 182.7 to 174.4. The edge over that
+baseline is the comparison that survives the difference.
 
 ## Run it
 
